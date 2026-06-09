@@ -98,25 +98,47 @@ interface HomeData {
   services?: { name: string; description: string; src: string }[];
 }
 
-export function Home() {
-  const [heading, setHeading] = useState("STAGE DESIGNER");
+interface Props {
+  initialData?: HomeData | null;
+}
+
+export function Home({ initialData }: Props = {}) {
+  const ih = initialData?.home;
+  const ip = initialData?.pages;
+
+  const [heading, setHeading] = useState(ih?.heading || "STAGE DESIGNER");
   const letters = heading.split("");
-  const [worksHeading,    setWorksHeading]    = useState("Featured Work");
-  const [worksIntro,      setWorksIntro]      = useState("Recent theatrical designs");
-  const [servicesHeading, setServicesHeading] = useState("Services");
-  const [servicesIntro,   setServicesIntro]   = useState("Comprehensive design services");
-  const [aboutHeading,    setAboutHeading]    = useState("About");
-  const [ctaHeading,      setCtaHeading]      = useState("Let's Collaborate");
-  const [ctaText,         setCtaText]         = useState("Available for theatrical design projects worldwide");
-  const [tagline, setTagline] = useState("Theatrical Models & Set Design");
-  const [ctaLabel, setCtaLabel] = useState("View My Work");
-  const [portraitUrl, setPortraitUrl] = useState(DEFAULT_PORTRAIT);
-  const [introParagraphs, setIntroParagraphs] = useState(DEFAULT_BIO_PARAGRAPHS_HOME);
-  const [stats, setStats] = useState(DEFAULT_STATS);
+  const [worksHeading,    setWorksHeading]    = useState(ip?.workPage?.heading     || "Featured Work");
+  const [worksIntro,      setWorksIntro]      = useState(ip?.workPage?.introText   || "");
+  const [servicesHeading, setServicesHeading] = useState(ip?.servicesPage?.heading || "Services");
+  const [servicesIntro,   setServicesIntro]   = useState(ip?.servicesPage?.introText || "");
+  const [aboutHeading,    setAboutHeading]    = useState(ip?.aboutPage?.heading    || "About");
+  const [ctaHeading,      setCtaHeading]      = useState(ip?.contactPage?.ctaHeading || "Let's Collaborate");
+  const [ctaText,         setCtaText]         = useState(ip?.contactPage?.ctaText    || "");
+  const [tagline, setTagline] = useState(ih?.tagline   || "");
+  const [ctaLabel, setCtaLabel] = useState(ih?.ctaLabel || "View My Work");
+  const [portraitUrl, setPortraitUrl] = useState(ih?.heroImageUrl || DEFAULT_PORTRAIT);
+  const [introParagraphs, setIntroParagraphs] = useState(
+    ip?.aboutPage?.bio ? ip.aboutPage.bio.split(/\n\n+/).filter(Boolean) : DEFAULT_BIO_PARAGRAPHS_HOME
+  );
+  const [stats, setStats] = useState(ih?.stats?.length ? ih.stats : DEFAULT_STATS);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isHovering, setIsHovering] = useState(false);
-  const [featuredWorks, setFeaturedWorks] = useState<FeaturedWork[]>(DEFAULT_FEATURED_WORKS);
-  const [services, setServices] = useState<ServiceItem[]>(DEFAULT_SERVICES);
+  const [featuredWorks, setFeaturedWorks] = useState<FeaturedWork[]>(
+    initialData?.featuredWorks?.length
+      ? initialData.featuredWorks.map((w, i) => ({ id: i + 1, src: w.src ?? "", title: w.title ?? "", year: w.year ?? "" }))
+      : []
+  );
+  const [services, setServices] = useState<ServiceItem[]>(
+    initialData?.services?.length
+      ? initialData.services.map((s, i) => ({
+          icon: DEFAULT_SERVICES[i % DEFAULT_SERVICES.length].icon,
+          title: s.name ?? "",
+          description: s.description ?? "",
+          image: s.src ?? "",
+        }))
+      : []
+  );
 
   useEffect(() => {
     fetch("/api/home")
@@ -649,7 +671,7 @@ function FeaturedWorkCard({
             alt={work.title}
             className="w-full h-[500px] object-cover rounded-3xl"
           />
-          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end p-6 rounded-3xl">
+          <div className="absolute inset-0 bg-black/50 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-500 flex items-end p-6 rounded-3xl">
             <div>
               <h3 className="text-2xl uppercase tracking-wider text-white mb-1">
                 {work.title}

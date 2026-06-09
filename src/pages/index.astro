@@ -1,11 +1,33 @@
 ---
 import Layout from "@/layouts/Layout.astro";
 import { Home } from "@/components/Home";
+
+const PROJECT_ID = "rcecmbgj";
+const DATASET = "production";
+const API_VER = "2024-01-01";
+const q = (query: string) =>
+  fetch(`https://${PROJECT_ID}.api.sanity.io/v${API_VER}/data/query/${DATASET}?query=${encodeURIComponent(query)}`);
+
+let initialData = null;
+try {
+  const [homeRes, pagesRes, worksRes, servicesRes] = await Promise.all([
+    q(`*[_type == "homePage"][0]{heading, tagline, ctaLabel, "heroImageUrl": heroImage.asset->url, stats[]{number, label}}`),
+    q(`{"workPage": *[_type == "workPage"][0]{heading, introText}, "servicesPage": *[_type == "servicesPage"][0]{heading, introText}, "aboutPage": *[_type == "aboutPage"][0]{heading, bio}, "contactPage": *[_type == "contactPage"][0]{ctaHeading, ctaText}}`),
+    q(`*[_type == "project"] | order(_createdAt desc)[0...3]{title, year, "src": coverImage.asset->url}`),
+    q(`*[_type == "service"] | order(order asc)[0...3]{name, description, "src": image.asset->url}`),
+  ]);
+  initialData = {
+    home: homeRes.ok ? (await homeRes.json()).result ?? {} : {},
+    pages: pagesRes.ok ? (await pagesRes.json()).result ?? {} : {},
+    featuredWorks: worksRes.ok ? (await worksRes.json()).result ?? [] : [],
+    services: servicesRes.ok ? (await servicesRes.json()).result ?? [] : [],
+  };
+} catch {}
 ---
 
 <Layout
   title="Onno — Stage Designer"
   description="Theatrical models, set design, and lighting for contemporary performance spaces."
 >
-  <Home client:load />
+  <Home initialData={initialData} client:load />
 </Layout>

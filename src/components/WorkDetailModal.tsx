@@ -49,7 +49,7 @@ export function WorkDetailModal({ item, onClose }: WorkDetailModalProps) {
           {/* Close */}
           <button
             onClick={onClose}
-            className="absolute top-6 right-6 z-10 text-black hover:text-red-500 transition-colors"
+            className="absolute top-6 right-6 z-10 text-red-500 hover:text-red-400 transition-colors"
             aria-label="Close"
           >
             <X size={28} strokeWidth={1.5} />
