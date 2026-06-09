@@ -1,0 +1,42 @@
+---
+import "@/styles/index.css";
+import Navigation from "@/components/Navigation.astro";
+import Footer from "@/components/Footer.astro";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = "Onno — Stage Designer",
+  description = "Theatrical models, set design, and lighting for contemporary performance spaces.",
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title}</title>
+  </head>
+  <body class="bg-black text-white">
+    <!-- Mobile only: zebra photo floats slowly behind all content -->
+    <div class="zebra-mobile-bg" aria-hidden="true">
+      <img
+        src="https://images.unsplash.com/photo-1539770158377-43832757b687?w=900&q=60&auto=format"
+        alt=""
+        loading="eager"
+        decoding="async"
+      />
+    </div>
+    <Navigation />
+    <main>
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>

@@ -1,0 +1,166 @@
+---
+const currentPath = Astro.url.pathname;
+
+const links = [
+  { href: "/", label: "Home" },
+  { href: "/work", label: "Work" },
+  { href: "/services", label: "Services" },
+  { href: "/about", label: "About" },
+  { href: "/contact", label: "Contact" },
+];
+---
+
+<nav
+  id="main-nav"
+  class="fixed top-0 left-0 right-0 z-50 bg-black/90 backdrop-blur-sm border-b border-white/10 overflow-hidden transition-transform duration-300"
+>
+  <!-- Minimalistic Zebra Pattern -->
+  <div class="absolute inset-0 opacity-[0.03] pointer-events-none">
+    {Array.from({ length: 8 }).map((_, i) => (
+      <div
+        class="absolute w-full bg-white"
+        style={`height: 15%; top: ${i * 12.5}%; transform: skewY(-2deg);`}
+      />
+    ))}
+  </div>
+
+  <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between relative z-10">
+    <!-- Logo -->
+    <a
+      href="/"
+      class="text-white text-2xl uppercase tracking-wider font-bold relative group"
+      aria-label="Home"
+    >
+      <span class="relative">
+        O<span class="text-red-500">N</span>
+      </span>
+      <div class="absolute -inset-12 border-2 border-white/20 group-hover:border-red-500 transition-all group-hover:shadow-[0_0_20px_rgba(239,68,68,0.8),inset_0_0_20px_rgba(239,68,68,0.4)]" />
+    </a>
+
+    <!-- Desktop Navigation -->
+    <div class="hidden md:flex gap-8">
+      {links.map((link) => {
+        const isActive =
+          link.href === "/"
+            ? currentPath === "/"
+            : currentPath.startsWith(link.href);
+        return (
+          <a
+            href={link.href}
+            class={`text-sm uppercase tracking-widest transition-all relative ${
+              isActive
+                ? "text-red-500 [text-shadow:0_0_20px_rgba(239,68,68,0.8)]"
+                : "text-white hover:text-red-500 hover:[text-shadow:0_0_20px_rgba(239,68,68,0.8)]"
+            }`}
+          >
+            {link.label}
+            {isActive && (
+              <span class="absolute -bottom-1 left-0 right-0 h-0.5 bg-red-500 shadow-[0_0_15px_rgba(239,68,68,0.8)]" />
+            )}
+          </a>
+        );
+      })}
+    </div>
+
+    <!-- Mobile Menu Button -->
+    <button
+      id="mobile-menu-btn"
+      class="md:hidden text-white p-2"
+      aria-label="Toggle menu"
+      aria-expanded="false"
+    >
+      <svg id="icon-menu" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="4" x2="20" y1="12" y2="12"/>
+        <line x1="4" x2="20" y1="6" y2="6"/>
+        <line x1="4" x2="20" y1="18" y2="18"/>
+      </svg>
+      <svg id="icon-close" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="hidden">
+        <path d="M18 6 6 18"/>
+        <path d="m6 6 12 12"/>
+      </svg>
+    </button>
+  </div>
+</nav>
+
+<!-- Mobile Navigation Overlay -->
+<div
+  id="mobile-menu"
+  class="fixed inset-0 z-[60] bg-black md:hidden hidden"
+  aria-hidden="true"
+>
+  <div class="flex flex-col items-center justify-center h-full gap-8">
+    {links.map((link, index) => (
+      <a
+        href={link.href}
+        class={`text-3xl uppercase tracking-widest transition-all mobile-nav-item opacity-0 ${
+          currentPath === link.href || (link.href !== "/" && currentPath.startsWith(link.href))
+            ? "text-red-500 [text-shadow:0_0_30px_rgba(239,68,68,0.9)]"
+            : "text-white hover:text-red-500 hover:[text-shadow:0_0_30px_rgba(239,68,68,0.9)]"
+        }`}
+        style={`transition-delay: ${index * 100}ms`}
+      >
+        {link.label}
+      </a>
+    ))}
+  </div>
+</div>
+
+<script>
+  // Mobile menu toggle
+  const btn = document.getElementById("mobile-menu-btn");
+  const menu = document.getElementById("mobile-menu");
+  const iconMenu = document.getElementById("icon-menu");
+  const iconClose = document.getElementById("icon-close");
+  const navItems = document.querySelectorAll(".mobile-nav-item");
+
+  btn?.addEventListener("click", () => {
+    const isOpen = menu?.classList.contains("hidden") === false;
+
+    if (isOpen) {
+      // Close
+      navItems.forEach((item) => item.classList.add("opacity-0"));
+      setTimeout(() => {
+        menu?.classList.add("hidden");
+        menu?.setAttribute("aria-hidden", "true");
+      }, 300);
+      iconMenu?.classList.remove("hidden");
+      iconClose?.classList.add("hidden");
+      btn?.setAttribute("aria-expanded", "false");
+    } else {
+      // Open
+      menu?.classList.remove("hidden");
+      menu?.setAttribute("aria-hidden", "false");
+      iconMenu?.classList.add("hidden");
+      iconClose?.classList.remove("hidden");
+      btn?.setAttribute("aria-expanded", "true");
+      // Stagger items in
+      navItems.forEach((item, i) => {
+        setTimeout(() => item.classList.remove("opacity-0"), i * 80);
+      });
+    }
+  });
+
+  // Close mobile menu when a link is clicked
+  menu?.querySelectorAll("a").forEach((link) => {
+    link.addEventListener("click", () => {
+      menu.classList.add("hidden");
+      iconMenu?.classList.remove("hidden");
+      iconClose?.classList.add("hidden");
+      btn?.setAttribute("aria-expanded", "false");
+    });
+  });
+
+  // Scroll detection: hide nav on scroll down, show on scroll up
+  let lastScrollY = window.scrollY;
+  const nav = document.getElementById("main-nav");
+
+  window.addEventListener("scroll", () => {
+    const currentScrollY = window.scrollY;
+    if (currentScrollY > lastScrollY && currentScrollY > 80) {
+      nav?.style.setProperty("transform", "translateY(-100%)");
+    } else {
+      nav?.style.setProperty("transform", "translateY(0)");
+    }
+    lastScrollY = currentScrollY;
+  }, { passive: true });
+</script>

@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+sanity/node_modules/
+
+# Build output
+dist/
+.astro/
+
+# Environment variables — NEVER commit these
+.env
+.env.local
+.env.*.local
+
+# Wrangler
+.wrangler/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Internal / agency docs
+PROJECT_BLUEPRINT.md
+
+# Editor
+.vscode/
+.idea/
+*.swp
