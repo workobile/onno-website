@@ -2,9 +2,9 @@ import type { APIRoute } from "astro";
 
 export const prerender = false;
 
-const PROJECT_ID = import.meta.env.SANITY_PROJECT_ID ?? "REPLACE_WITH_YOUR_PROJECT_ID";
-const DATASET = import.meta.env.SANITY_DATASET ?? "production";
-const API_VERSION = import.meta.env.SANITY_API_VERSION ?? "2024-01-01";
+const PROJECT_ID = "rcecmbgj";
+const DATASET = "production";
+const API_VERSION = "2024-01-01";
 
 export const GET: APIRoute = async () => {
   const pageQuery = encodeURIComponent(

@@ -2,9 +2,9 @@ import type { APIRoute } from "astro";
 
 export const prerender = false;
 
-const PROJECT_ID = import.meta.env.SANITY_PROJECT_ID ?? "REPLACE_WITH_YOUR_PROJECT_ID";
+const PROJECT_ID = "rcecmbgj";
 const DATASET    = import.meta.env.SANITY_DATASET    ?? "production";
-const API_VER    = import.meta.env.SANITY_API_VERSION ?? "2024-01-01";
+const API_VER    = "2024-01-01";
 
 const q = (query: string) =>
   fetch(`https://${PROJECT_ID}.api.sanity.io/v${API_VER}/data/query/${DATASET}?query=${encodeURIComponent(query)}`);
